@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import OpenAI from "openai";
 import type { PortfolioOutput } from "@/lib/types";
 import { SYSTEM_PROMPT, buildPrompt } from "@/lib/prompts";
 
@@ -8,7 +7,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const Schema = z.object({
-  amount_chf: z.number().min(1000).max(10000000),
+  amount_chf: z.number().min(100).max(10000000),
   horizon_years: z.number().int().min(1).max(50),
   risk: z.enum(["low", "medium", "high"]),
   style: z.enum(["tech", "esg", "value", "dividend", "balanced", "emerging"]),
@@ -33,34 +32,35 @@ export async function POST(req: Request) {
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   const data = parsed.data;
 
+  const withAmounts = (lines: PortfolioOutput["lines"]) =>
+    lines.map(l => ({ ...l, amount_chf: Math.round(l.allocation_pct / 100 * data.amount_chf) }));
+
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey || apiKey === "dummy") {
-    const fb = { ...FALLBACK, lines: FALLBACK.lines.map(l => ({ ...l, amount_chf: Math.round(l.allocation_pct / 100 * data.amount_chf) })) };
-    return NextResponse.json(fb);
+    return NextResponse.json({ ...FALLBACK, lines: withAmounts(FALLBACK.lines) });
   }
 
   try {
-    const client = new OpenAI({
-      apiKey,
-      baseURL: process.env.OPENAI_BASE_URL ?? "https://api.deepseek.com/v1",
-      timeout: 25000,
-    });
-    const resp = await client.chat.completions.create({
-      model: process.env.OPENAI_MODEL ?? "deepseek-chat",
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: buildPrompt(data) },
-      ],
-      temperature: 0.3,
-    });
-    const content = resp.choices[0]?.message?.content ?? "{}";
-    const result = JSON.parse(content) as PortfolioOutput;
-    result.lines = result.lines.map(l => ({ ...l, amount_chf: Math.round(l.allocation_pct / 100 * data.amount_chf) }));
-    return NextResponse.json(result);
+    const prompt = `${SYSTEM_PROMPT}\n\n${buildPrompt(data)}`;
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { responseMimeType: "application/json", temperature: 0.3 },
+        }),
+      }
+    );
+
+    const json = await res.json();
+    const text = json?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    const clean = text.replace(/```json|```/g, "").trim();
+    const result = JSON.parse(clean) as PortfolioOutput;
+    return NextResponse.json({ ...result, lines: withAmounts(result.lines) });
   } catch (err) {
-    console.error("LLM error", err);
-    const fb = { ...FALLBACK, lines: FALLBACK.lines.map(l => ({ ...l, amount_chf: Math.round(l.allocation_pct / 100 * data.amount_chf) })) };
-    return NextResponse.json(fb);
+    console.error("Gemini error", err);
+    return NextResponse.json({ ...FALLBACK, lines: withAmounts(FALLBACK.lines) });
   }
 }
