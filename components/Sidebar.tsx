@@ -8,7 +8,7 @@ export function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="logo-block">
-        <Image src="/vic-logo.png" alt="VIC Investment Club" width={80} height={32} style={{ height:32, width:"auto" }} />
+        <span style={{ fontSize:28, fontWeight:700, letterSpacing:"-1.5px", color:"#2d3142" }}>VIC</span>
       </div>
       <div className="nav-section">
         <div className="nav-label">Advisor</div>
