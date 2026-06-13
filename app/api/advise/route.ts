@@ -15,7 +15,7 @@ const Schema = z.object({
 });
 
 const FALLBACK: PortfolioOutput = {
-  summary: "A diversified portfolio built for your profile. Based on your risk level and horizon, we recommend a mix of global equities and bonds.",
+  summary: "A diversified portfolio built for your profile.",
   lines: [
     { name: "iShares Core MSCI World UCITS ETF", isin: "IE00B4L5Y983", type: "ETF", allocation_pct: 40, amount_chf: 0, ter_pct: 0.20, exchange: "Xetra", currency: "USD" },
     { name: "iShares Nasdaq 100 UCITS ETF", isin: "IE00B53SZB19", type: "ETF", allocation_pct: 20, amount_chf: 0, ter_pct: 0.33, exchange: "Xetra", currency: "USD" },
@@ -36,31 +36,39 @@ export async function POST(req: Request) {
     lines.map(l => ({ ...l, amount_chf: Math.round(l.allocation_pct / 100 * data.amount_chf) }));
 
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey || apiKey === "dummy") {
+  const baseUrl = process.env.OPENAI_BASE_URL ?? "https://api.groq.com/openai/v1";
+  const model = process.env.OPENAI_MODEL ?? "llama-3.3-70b-versatile";
+
+  if (!apiKey) {
     return NextResponse.json({ ...FALLBACK, lines: withAmounts(FALLBACK.lines) });
   }
 
   try {
-    const prompt = `${SYSTEM_PROMPT}\n\n${buildPrompt(data)}`;
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { responseMimeType: "application/json", temperature: 0.3 },
-        }),
-      }
-    );
+    const res = await fetch(`${baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        temperature: 0.3,
+        response_format: { type: "json_object" },
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: buildPrompt(data) },
+        ],
+      }),
+    });
 
     const json = await res.json();
-    const text = json?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    console.log("API response:", JSON.stringify(json).slice(0, 300));
+    const text = json?.choices?.[0]?.message?.content ?? "";
     const clean = text.replace(/```json|```/g, "").trim();
     const result = JSON.parse(clean) as PortfolioOutput;
     return NextResponse.json({ ...result, lines: withAmounts(result.lines) });
   } catch (err) {
-    console.error("Gemini error", err);
+    console.error("API error:", err);
     return NextResponse.json({ ...FALLBACK, lines: withAmounts(FALLBACK.lines) });
   }
 }
