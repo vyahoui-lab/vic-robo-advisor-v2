@@ -1,0 +1,16 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="fav-top">
+      <rect x="0" y="0" width="64" height="42" />
+    </clipPath>
+  </defs>
+  <!-- Parchment background so the favicon reads on any OS theme -->
+  <rect width="64" height="64" rx="10" fill="#f4eedf" />
+  <!-- Rising sun (top half of disc) -->
+  <circle cx="32" cy="42" r="20" fill="#a8211a" clip-path="url(#fav-top)" />
+  <!-- Horizon line -->
+  <rect x="6" y="41" width="52" height="3" fill="#1a1814" />
+  <!-- Terminal ticks -->
+  <rect x="6" y="41" width="3" height="8" fill="#1a1814" />
+  <rect x="55" y="41" width="3" height="8" fill="#1a1814" />
+</svg>
