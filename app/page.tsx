@@ -120,6 +120,12 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* Returns disclaimer */}
+              <div style={{fontSize:11, color:"var(--vic-faint)", marginTop:10, display:"flex", alignItems:"flex-start", gap:5, lineHeight:1.5}}>
+                <span>⚠️</span>
+                <span>Expected return ranges are indicative and based on historical data. They imply risk, are not guaranteed, and apply over the long term only.</span>
+              </div>
+
               {/* 04 Style — multi-select */}
               <div className="field">
                 <div className="field-label">04 — What do you believe in? <span style={{fontWeight:400, textTransform:"none", letterSpacing:0, color:"var(--vic-faint)", fontSize:10}}>(select one or more)</span></div>
