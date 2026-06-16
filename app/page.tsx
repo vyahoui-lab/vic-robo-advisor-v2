@@ -25,6 +25,17 @@ const SCOPES: { id: MarketScope; flag: string; name: string; desc: string }[] = 
   { id: "mixed",         flag: "⚖️", name: "Mixed",         desc: "Both Swiss + global" },
 ];
 
+const card = (on: boolean): React.CSSProperties => ({
+  border: `1.5px solid ${on ? "#2d3142" : "#e4e3de"}`,
+  borderRadius: 10,
+  padding: 12,
+  cursor: "pointer",
+  background: on ? "#eef0f7" : "#fff",
+  userSelect: "none",
+  WebkitUserSelect: "none",
+  touchAction: "manipulation",
+});
+
 export default function Home() {
   const router = useRouter();
   const [amount, setAmount] = useState("");
@@ -42,20 +53,19 @@ export default function Home() {
     );
   }
 
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
+  function submit() {
+    if (loading) return;
     setLoading(true);
     const intake = {
       amount_chf: parseInt(amount.replace(/[^0-9]/g, ""), 10) || 10000,
       horizon_years: parseInt(horizon, 10) || 10,
-      risk,
-      style: styles[0],
-      styles,
-      scope,
+      risk, style: styles[0], styles, scope,
     };
     const encoded = btoa(encodeURIComponent(JSON.stringify(intake)));
     router.push(`/results?d=${encoded}`);
   }
+
+  const lbl: React.CSSProperties = { fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em", color: "#9099ab", fontWeight: 600, marginBottom: 12 };
 
   return (
     <div className="shell">
@@ -72,94 +82,97 @@ export default function Home() {
               <p className="hero-sub">5 questions. Get your personalised portfolio with exact ETFs, ISINs, and amounts.</p>
             </div>
 
-            <form onSubmit={submit}>
-              <div className="field">
-                <div className="field-label">01 — Amount to invest</div>
-                <div className="amount-row">
-                  <span className="amount-prefix">CHF</span>
-                  <input className="amount-input" type="text" inputMode="numeric"
-                    value={amount} onChange={e => setAmount(e.target.value)} placeholder="10,000" />
-                </div>
+            {/* 01 Amount */}
+            <div className="field">
+              <div style={lbl}>01 — Amount to invest</div>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                <span style={{ fontSize: 16, fontWeight: 600, color: "#4a506b" }}>CHF</span>
+                <input className="amount-input" type="text" inputMode="numeric"
+                  value={amount} onChange={e => setAmount(e.target.value)} placeholder="10,000" />
               </div>
+            </div>
 
-              <div className="field">
-                <div className="field-label">02 — Investment horizon</div>
-                <div className="amount-row">
-                  <input className="amount-input" type="text" inputMode="numeric"
-                    style={{ width: 80 }}
-                    value={horizon} onChange={e => setHorizon(e.target.value)} placeholder="10" />
-                  <span className="amount-prefix">years</span>
-                </div>
+            {/* 02 Horizon */}
+            <div className="field">
+              <div style={lbl}>02 — Investment horizon</div>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                <input className="amount-input" type="text" inputMode="numeric"
+                  style={{ width: 80 }}
+                  value={horizon} onChange={e => setHorizon(e.target.value)} placeholder="10" />
+                <span style={{ fontSize: 16, fontWeight: 600, color: "#4a506b" }}>years</span>
               </div>
+            </div>
 
-              <div className="field">
-                <div className="field-label">03 — Risk level</div>
-                <div className="risk-row">
-                  {RISKS.map(r => (
-                    <button key={r.id} type="button"
-                      className={`risk-card${risk === r.id ? " on" : ""}`}
-                      onClick={() => setRisk(r.id)}>
-                      <div className="risk-name">{r.name}</div>
-                      <div className="risk-desc">{r.desc}</div>
-                      <div className="risk-return">{r.ret}</div>
-                    </button>
-                  ))}
-                </div>
-                <div style={{ fontSize: 11, color: "var(--vic-faint)", marginTop: 10, display: "flex", gap: 5, lineHeight: 1.5 }}>
-                  <span>⚠️</span>
-                  <span>Expected return ranges are indicative, based on historical data, imply risk, are not guaranteed, and apply over the long term only.</span>
-                </div>
+            {/* 03 Risk */}
+            <div className="field">
+              <div style={lbl}>03 — Risk level</div>
+              <div style={{ display: "flex", gap: 8, flexDirection: "column" }}>
+                {RISKS.map(r => (
+                  <div key={r.id} style={card(risk === r.id)} onClick={() => setRisk(r.id)}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "#2d3142" }}>{r.name}</div>
+                        <div style={{ fontSize: 11, color: "#9099ab", marginTop: 2 }}>{r.desc}</div>
+                      </div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "#16a34a" }}>{r.ret}</div>
+                    </div>
+                  </div>
+                ))}
               </div>
-
-              <div className="field">
-                <div className="field-label">
-                  04 — What do you believe in?
-                  <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0, color: "var(--vic-faint)", fontSize: 10, marginLeft: 8 }}>select one or more</span>
-                </div>
-                <div className="style-grid">
-                  {STYLES.map(s => (
-                    <button key={s.id} type="button"
-                      className={`style-card${styles.includes(s.id) ? " on" : ""}`}
-                      onClick={() => toggleStyle(s.id)}>
-                      <div className="style-icon">{s.icon}</div>
-                      <div className="style-name">{s.name}</div>
-                      <div className="style-desc">{s.desc}</div>
-                      {styles.includes(s.id) && <div style={{ fontSize: 10, color: "var(--vic)", marginTop: 4, fontWeight: 600 }}>✓</div>}
-                    </button>
-                  ))}
-                </div>
+              <div style={{ fontSize: 11, color: "#9099ab", marginTop: 10, display: "flex", gap: 5, lineHeight: 1.5 }}>
+                <span>⚠️</span>
+                <span>Expected return ranges are indicative, based on historical data, imply risk, are not guaranteed, and apply over the long term only.</span>
               </div>
+            </div>
 
-              <div className="field">
-                <div className="field-label">05 — Swiss or international?</div>
-                <div className="scope-grid">
-                  {SCOPES.map(s => (
-                    <button key={s.id} type="button"
-                      className={`scope-card${scope === s.id ? " on" : ""}`}
-                      onClick={() => setScope(s.id)}>
-                      <div className="scope-flag">{s.flag}</div>
-                      <div className="scope-name">{s.name}</div>
-                      <div className="scope-desc">{s.desc}</div>
-                    </button>
-                  ))}
-                </div>
+            {/* 04 Style */}
+            <div className="field">
+              <div style={lbl}>04 — What do you believe in? <span style={{ fontWeight: 400, fontSize: 10 }}>select one or more</span></div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+                {STYLES.map(s => (
+                  <div key={s.id} style={card(styles.includes(s.id))} onClick={() => toggleStyle(s.id)}>
+                    <div style={{ fontSize: 18, marginBottom: 4 }}>{s.icon}</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "#2d3142" }}>{s.name}</div>
+                    <div style={{ fontSize: 10, color: "#9099ab", marginTop: 2 }}>{s.desc}</div>
+                    {styles.includes(s.id) && <div style={{ fontSize: 10, color: "#2d3142", marginTop: 4, fontWeight: 700 }}>✓</div>}
+                  </div>
+                ))}
               </div>
+            </div>
 
-              <div className="submit-row">
-                <button type="submit" disabled={loading} className="btn-primary">
-                  {loading ? "Redirecting…" : (
-                    <>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                      Get my portfolio
-                    </>
-                  )}
-                </button>
+            {/* 05 Scope */}
+            <div className="field">
+              <div style={lbl}>05 — Swiss or international?</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+                {SCOPES.map(s => (
+                  <div key={s.id} style={card(scope === s.id)} onClick={() => setScope(s.id)}>
+                    <div style={{ fontSize: 20, marginBottom: 4 }}>{s.flag}</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "#2d3142" }}>{s.name}</div>
+                    <div style={{ fontSize: 10, color: "#9099ab", marginTop: 2 }}>{s.desc}</div>
+                  </div>
+                ))}
               </div>
-            </form>
+            </div>
 
-            <div style={{ marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 8 }}>
+            {/* Submit */}
+            <div style={{ paddingTop: 24 }}>
+              <div
+                onClick={submit}
+                style={{
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                  height: 52, background: loading ? "#9099ab" : "#2d3142", color: "#fff",
+                  borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer",
+                  touchAction: "manipulation", userSelect: "none", WebkitUserSelect: "none",
+                }}
+              >
+                {loading ? "Loading…" : "→ Get my portfolio"}
+              </div>
+            </div>
+
+            {/* LinkedIn */}
+            <div style={{ marginTop: 32, paddingTop: 16, borderTop: "1px solid #e4e3de" }}>
               <a href="https://www.linkedin.com/company/vic-investment-club" target="_blank" rel="noopener noreferrer"
-                style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--vic-faint)", textDecoration: "none" }}>
+                style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "#9099ab", textDecoration: "none" }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
                 Follow VIC Investment Club on LinkedIn
               </a>
