@@ -186,3 +186,10 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20p
 .spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--vic); border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-text { font-size: 13px; color: var(--vic-faint); }
+
+.risk-return {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green);
+  margin-top: 5px;
+}

@@ -7,6 +7,7 @@ export type IntakeData = {
   horizon_years: number;
   risk: RiskLevel;
   style: InvestmentStyle;
+  styles: InvestmentStyle[];
   scope: MarketScope;
 };
 

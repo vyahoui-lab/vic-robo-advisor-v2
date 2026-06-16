@@ -11,6 +11,7 @@ const Schema = z.object({
   horizon_years: z.number().int().min(1).max(50),
   risk: z.enum(["low", "medium", "high"]),
   style: z.enum(["tech", "esg", "value", "dividend", "balanced", "emerging"]),
+  styles: z.array(z.enum(["tech", "esg", "value", "dividend", "balanced", "emerging"])).optional(),
   scope: z.enum(["swiss", "international", "mixed"]),
 });
 
@@ -30,7 +31,7 @@ export async function POST(req: Request) {
   try { body = await req.json(); } catch { return NextResponse.json({ error: "bad json" }, { status: 400 }); }
   const parsed = Schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
-  const data = parsed.data;
+  const data = { ...parsed.data, styles: parsed.data.styles ?? [parsed.data.style] };
 
   const withAmounts = (lines: PortfolioOutput["lines"]) =>
     lines.map(l => ({ ...l, amount_chf: Math.round(l.allocation_pct / 100 * data.amount_chf) }));
@@ -62,7 +63,6 @@ export async function POST(req: Request) {
     });
 
     const json = await res.json();
-    console.log("API response:", JSON.stringify(json).slice(0, 300));
     const text = json?.choices?.[0]?.message?.content ?? "";
     const clean = text.replace(/```json|```/g, "").trim();
     const result = JSON.parse(clean) as PortfolioOutput;
