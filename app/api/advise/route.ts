@@ -6,6 +6,12 @@ import { SYSTEM_PROMPT, buildPrompt } from "@/lib/prompts";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
 const Schema = z.object({
   amount_chf: z.number().min(100).max(10000000),
   horizon_years: z.number().int().min(1).max(50),
@@ -26,11 +32,17 @@ const FALLBACK: PortfolioOutput = {
   ],
 };
 
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: CORS });
+}
+
 export async function POST(req: Request) {
   let body: unknown;
-  try { body = await req.json(); } catch { return NextResponse.json({ error: "bad json" }, { status: 400 }); }
+  try { body = await req.json(); } catch {
+    return NextResponse.json({ error: "bad json" }, { status: 400, headers: CORS });
+  }
   const parsed = Schema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400, headers: CORS });
   const data = { ...parsed.data, styles: parsed.data.styles ?? [parsed.data.style] };
 
   const withAmounts = (lines: PortfolioOutput["lines"]) =>
@@ -41,7 +53,7 @@ export async function POST(req: Request) {
   const model = process.env.OPENAI_MODEL ?? "llama-3.3-70b-versatile";
 
   if (!apiKey) {
-    return NextResponse.json({ ...FALLBACK, lines: withAmounts(FALLBACK.lines) });
+    return NextResponse.json({ ...FALLBACK, lines: withAmounts(FALLBACK.lines) }, { headers: CORS });
   }
 
   try {
@@ -66,9 +78,9 @@ export async function POST(req: Request) {
     const text = json?.choices?.[0]?.message?.content ?? "";
     const clean = text.replace(/```json|```/g, "").trim();
     const result = JSON.parse(clean) as PortfolioOutput;
-    return NextResponse.json({ ...result, lines: withAmounts(result.lines) });
+    return NextResponse.json({ ...result, lines: withAmounts(result.lines) }, { headers: CORS });
   } catch (err) {
     console.error("API error:", err);
-    return NextResponse.json({ ...FALLBACK, lines: withAmounts(FALLBACK.lines) });
+    return NextResponse.json({ ...FALLBACK, lines: withAmounts(FALLBACK.lines) }, { headers: CORS });
   }
 }
