@@ -205,3 +205,8 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--vic);
   .line-isin { font-size: 10px; }
   .portfolio-header { padding: 12px 14px; }
 }
+
+/* Safari iPhone fix */
+button { cursor: pointer; -webkit-tap-highlight-color: rgba(0,0,0,0.1); touch-action: manipulation; }
+.risk-card, .style-card, .scope-card, .btn-primary, .btn-ghost { -webkit-tap-highlight-color: rgba(45,49,66,0.1); touch-action: manipulation; cursor: pointer; }
+* { -webkit-text-size-adjust: 100%; }
