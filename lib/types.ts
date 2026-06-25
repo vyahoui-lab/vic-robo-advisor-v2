@@ -1,4 +1,4 @@
-export type InvestmentStyle = "tech" | "esg" | "value" | "dividend" | "balanced" | "emerging";
+export type InvestmentStyle = "tech" | "esg" | "value" | "dividend" | "balanced" | "emerging" | "realestate" | "commodities" | "bonds";
 export type MarketScope = "swiss" | "international" | "mixed";
 export type RiskLevel = "low" | "medium" | "high";
 
@@ -9,6 +9,7 @@ export type IntakeData = {
   style: InvestmentStyle;
   styles: InvestmentStyle[];
   scope: MarketScope;
+  currency?: string;
 };
 
 export type PortfolioLine = {

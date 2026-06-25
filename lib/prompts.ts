@@ -7,18 +7,21 @@ const STYLE: Record<string, string> = {
   dividend: "Dividend: MSCI High Dividend Yield, dividend aristocrats.",
   balanced: "Balanced: classic MSCI World + bond mix.",
   emerging: "Emerging Markets: MSCI EM, India, Southeast Asia.",
+  realestate: "Real Estate: REITs ETFs, global property funds.",
+  commodities: "Commodities: gold ETFs, broad commodity ETFs, energy.",
+  bonds: "Fixed Income: aggregate bond ETFs, government bonds, investment grade.",
 };
 
 const SCOPE: Record<string, string> = {
-  swiss: "Prioritise CHF-denominated funds on SIX Swiss Exchange. At least 50% Swiss-listed.",
-  international: "Focus on global ETFs on Xetra or Euronext. MSCI World, S&P 500, Nasdaq.",
-  mixed: "Mix of Swiss-listed CHF funds and international ETFs.",
+  swiss: "Prioritise CHF-denominated funds on SIX Swiss Exchange.",
+  international: "Focus on global ETFs on Xetra or Euronext.",
+  mixed: "Mix of Swiss and international ETFs.",
 };
 
 const RISK: Record<string, string> = {
-  low: "Conservative: ~40% equity, ~50% bonds, ~10% cash. Expected return ~3-5%/yr.",
-  medium: "Balanced: ~65% equity, ~30% bonds, ~5% cash. Expected return ~6-8%/yr.",
-  high: "Aggressive: ~85% equity, ~12% bonds, ~3% cash. Expected return ~8-12%/yr.",
+  low: "Conservative: ~40% equity, ~50% bonds, ~10% cash.",
+  medium: "Balanced: ~65% equity, ~30% bonds, ~5% cash.",
+  high: "Aggressive: ~85% equity, ~12% bonds, ~3% cash.",
 };
 
 export const SYSTEM_PROMPT = `You are VIC, a portfolio advisor for the Vic Investment Club.
@@ -44,17 +47,19 @@ JSON schema:
 Rules:
 - 4 to 6 lines, sum to exactly 100%
 - Real funds with valid ISINs only
-- Blend the selected investment themes proportionally`;
+- Blend the selected investment themes proportionally
+- Prefer funds denominated in the user's chosen currency where possible`;
 
 export function buildPrompt(data: IntakeData): string {
   const styleList = (data.styles ?? [data.style]).map(s => STYLE[s]).join("\n- ");
   return `Investor profile:
-- Amount: CHF ${data.amount_chf.toLocaleString()}
+- Amount: ${data.currency ?? "CHF"} ${data.amount_chf.toLocaleString()}
 - Horizon: ${data.horizon_years} years
 - Risk: ${data.risk} — ${RISK[data.risk]}
-- Investment themes (blend these): 
+- Investment themes (blend these):
 - ${styleList}
 - Scope: ${data.scope} — ${SCOPE[data.scope]}
+- Preferred currency: ${data.currency ?? "CHF"}
 
-Return the JSON portfolio blending all selected themes.`;
+Return the JSON portfolio.`;
 }

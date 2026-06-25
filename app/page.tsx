@@ -5,12 +5,15 @@ import { Sidebar } from "@/components/Sidebar";
 import type { InvestmentStyle, MarketScope, RiskLevel } from "@/lib/types";
 
 const STYLES: { id: InvestmentStyle; icon: string; name: string; desc: string }[] = [
-  { id: "tech",     icon: "🤖", name: "Tech & AI",   desc: "Nasdaq, semis, cloud" },
-  { id: "esg",      icon: "🌱", name: "ESG",         desc: "Sustainable, green" },
-  { id: "value",    icon: "💎", name: "Value",       desc: "Undervalued, quality" },
-  { id: "dividend", icon: "💰", name: "Dividend",    desc: "Income, yield" },
-  { id: "balanced", icon: "⚖️", name: "Balanced",    desc: "Classic 60/40" },
-  { id: "emerging", icon: "🌏", name: "Emerging",    desc: "EM, India, SEA" },
+  { id: "tech",      icon: "🤖", name: "Tech & AI",      desc: "Nasdaq, semis, cloud" },
+  { id: "esg",       icon: "🌱", name: "ESG",            desc: "Sustainable, green" },
+  { id: "value",     icon: "💎", name: "Value",          desc: "Undervalued, quality" },
+  { id: "dividend",  icon: "💰", name: "Dividend",       desc: "Income, yield" },
+  { id: "balanced",  icon: "⚖️", name: "Balanced",       desc: "Classic 60/40" },
+  { id: "emerging",  icon: "🌏", name: "Emerging",       desc: "EM, India, SEA" },
+  { id: "realestate",icon: "🏠", name: "Real Estate",    desc: "REITs, property" },
+  { id: "commodities",icon:"🪙", name: "Commodities",    desc: "Gold, oil, metals" },
+  { id: "bonds",     icon: "📄", name: "Bonds",          desc: "Fixed income, safety" },
 ];
 
 const RISKS: { id: RiskLevel; name: string; desc: string; ret: string }[] = [
@@ -19,21 +22,24 @@ const RISKS: { id: RiskLevel; name: string; desc: string; ret: string }[] = [
   { id: "high",   name: "Aggressive",   desc: "Mostly stocks",    ret: "~8–12% / yr" },
 ];
 
-const SCOPES: { id: MarketScope; flag: string; name: string; desc: string }[] = [
-  { id: "swiss",         flag: "🇨🇭", name: "Swiss",        desc: "SIX, CHF-denominated" },
-  { id: "international", flag: "🌍", name: "International", desc: "MSCI World, S&P, Nasdaq" },
-  { id: "mixed",         flag: "⚖️", name: "Mixed",         desc: "Both Swiss + global" },
+const CURRENCIES = [
+  { code: "CHF", flag: "🇨🇭", name: "Swiss Franc" },
+  { code: "USD", flag: "🇺🇸", name: "US Dollar" },
+  { code: "EUR", flag: "🇪🇺", name: "Euro" },
+  { code: "GBP", flag: "🇬🇧", name: "British Pound" },
+  { code: "JPY", flag: "🇯🇵", name: "Japanese Yen" },
+  { code: "AUD", flag: "🇦🇺", name: "Australian Dollar" },
+  { code: "CAD", flag: "🇨🇦", name: "Canadian Dollar" },
+  { code: "CNY", flag: "🇨🇳", name: "Chinese Yuan" },
+  { code: "HKD", flag: "🇭🇰", name: "Hong Kong Dollar" },
+  { code: "SGD", flag: "🇸🇬", name: "Singapore Dollar" },
 ];
 
 const card = (on: boolean): React.CSSProperties => ({
   border: `1.5px solid ${on ? "#2d3142" : "#e4e3de"}`,
-  borderRadius: 10,
-  padding: 12,
-  cursor: "pointer",
+  borderRadius: 10, padding: 12, cursor: "pointer",
   background: on ? "#eef0f7" : "#fff",
-  userSelect: "none",
-  WebkitUserSelect: "none",
-  touchAction: "manipulation",
+  userSelect: "none", WebkitUserSelect: "none", touchAction: "manipulation",
 });
 
 export default function Home() {
@@ -42,7 +48,7 @@ export default function Home() {
   const [horizon, setHorizon] = useState("");
   const [risk, setRisk] = useState<RiskLevel>("medium");
   const [styles, setStyles] = useState<InvestmentStyle[]>(["balanced"]);
-  const [scope, setScope] = useState<MarketScope>("mixed");
+  const [currency, setCurrency] = useState("CHF");
   const [loading, setLoading] = useState(false);
 
   function toggleStyle(id: InvestmentStyle) {
@@ -59,7 +65,9 @@ export default function Home() {
     const intake = {
       amount_chf: parseInt(amount.replace(/[^0-9]/g, ""), 10) || 10000,
       horizon_years: parseInt(horizon, 10) || 10,
-      risk, style: styles[0], styles, scope,
+      risk, style: styles[0], styles,
+      scope: "mixed" as MarketScope,
+      currency,
     };
     const encoded = btoa(encodeURIComponent(JSON.stringify(intake)));
     router.push(`/results?d=${encoded}`);
@@ -71,9 +79,7 @@ export default function Home() {
     <div className="shell">
       <Sidebar />
       <main className="main">
-        <div className="topbar">
-          <div className="topbar-title">Build my portfolio</div>
-        </div>
+        <div className="topbar"><div className="topbar-title">Build my portfolio</div></div>
         <div className="content">
           <div className="form-wrap">
             <div className="hero">
@@ -86,7 +92,7 @@ export default function Home() {
             <div className="field">
               <div style={lbl}>01 — Amount to invest</div>
               <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                <span style={{ fontSize: 16, fontWeight: 600, color: "#4a506b" }}>CHF</span>
+                <span style={{ fontSize: 16, fontWeight: 600, color: "#4a506b" }}>{currency}</span>
                 <input className="amount-input" type="text" inputMode="numeric"
                   value={amount} onChange={e => setAmount(e.target.value)} placeholder="10,000" />
               </div>
@@ -125,9 +131,9 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 04 Style */}
+            {/* 04 Style — 9 options */}
             <div className="field">
-              <div style={lbl}>04 — What do you believe in? <span style={{ fontWeight: 400, fontSize: 10 }}>select one or more</span></div>
+              <div style={lbl}>04 — What do you believe in? <span style={{ fontWeight: 400, fontSize: 10, textTransform: "none", letterSpacing: 0 }}>select one or more</span></div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
                 {STYLES.map(s => (
                   <div key={s.id} style={card(styles.includes(s.id))} onClick={() => toggleStyle(s.id)}>
@@ -140,15 +146,15 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 05 Scope */}
+            {/* 05 Currency */}
             <div className="field">
-              <div style={lbl}>05 — Swiss or international?</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
-                {SCOPES.map(s => (
-                  <div key={s.id} style={card(scope === s.id)} onClick={() => setScope(s.id)}>
-                    <div style={{ fontSize: 20, marginBottom: 4 }}>{s.flag}</div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: "#2d3142" }}>{s.name}</div>
-                    <div style={{ fontSize: 10, color: "#9099ab", marginTop: 2 }}>{s.desc}</div>
+              <div style={lbl}>05 — Investment currency</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: 8 }}>
+                {CURRENCIES.map(c => (
+                  <div key={c.code} style={card(currency === c.code)} onClick={() => setCurrency(c.code)}>
+                    <div style={{ fontSize: 18, marginBottom: 4 }}>{c.flag}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#2d3142" }}>{c.code}</div>
+                    <div style={{ fontSize: 9, color: "#9099ab", marginTop: 2 }}>{c.name}</div>
                   </div>
                 ))}
               </div>
@@ -156,20 +162,16 @@ export default function Home() {
 
             {/* Submit */}
             <div style={{ paddingTop: 24 }}>
-              <div
-                onClick={submit}
-                style={{
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                  height: 52, background: loading ? "#9099ab" : "#2d3142", color: "#fff",
-                  borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer",
-                  touchAction: "manipulation", userSelect: "none", WebkitUserSelect: "none",
-                }}
-              >
+              <div onClick={submit} style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                height: 52, background: loading ? "#9099ab" : "#2d3142", color: "#fff",
+                borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer",
+                touchAction: "manipulation", userSelect: "none", WebkitUserSelect: "none",
+              }}>
                 {loading ? "Loading…" : "→ Get my portfolio"}
               </div>
             </div>
 
-            {/* LinkedIn */}
             <div style={{ marginTop: 32, paddingTop: 16, borderTop: "1px solid #e4e3de" }}>
               <a href="https://www.linkedin.com/company/vic-investment-club" target="_blank" rel="noopener noreferrer"
                 style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "#9099ab", textDecoration: "none" }}>
