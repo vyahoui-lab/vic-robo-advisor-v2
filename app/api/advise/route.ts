@@ -5,20 +5,16 @@ import { SYSTEM_PROMPT, buildPrompt } from "@/lib/prompts";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-const CORS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-};
+export const maxDuration = 30;
 
 const Schema = z.object({
   amount_chf: z.number().min(100).max(10000000),
   horizon_years: z.number().int().min(1).max(50),
   risk: z.enum(["low", "medium", "high"]),
-  style: z.enum(["tech", "esg", "value", "dividend", "balanced", "emerging"]),
-  styles: z.array(z.enum(["tech", "esg", "value", "dividend", "balanced", "emerging"])).optional(),
+  style: z.enum(["tech", "esg", "value", "dividend", "balanced", "emerging", "realestate", "commodities", "bonds"]),
+  styles: z.array(z.enum(["tech", "esg", "value", "dividend", "balanced", "emerging", "realestate", "commodities", "bonds"])).optional(),
   scope: z.enum(["swiss", "international", "mixed"]),
+  currency: z.string().optional(),
 });
 
 const FALLBACK: PortfolioOutput = {
@@ -30,6 +26,12 @@ const FALLBACK: PortfolioOutput = {
     { name: "Xtrackers MSCI Emerging Markets ETF", isin: "IE00BTJRMP35", type: "ETF", allocation_pct: 10, amount_chf: 0, ter_pct: 0.18, exchange: "Xetra", currency: "USD" },
     { name: "iShares Core Global Aggregate Bond ETF", isin: "IE00B3F81409", type: "Bond ETF", allocation_pct: 15, amount_chf: 0, ter_pct: 0.10, exchange: "Xetra", currency: "USD" },
   ],
+};
+
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
 };
 
 export async function OPTIONS() {
@@ -56,6 +58,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ ...FALLBACK, lines: withAmounts(FALLBACK.lines) }, { headers: CORS });
   }
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25000);
+
   try {
     const res = await fetch(`${baseUrl}/chat/completions`, {
       method: "POST",
@@ -63,6 +68,7 @@ export async function POST(req: Request) {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,
       },
+      signal: controller.signal,
       body: JSON.stringify({
         model,
         temperature: 0.3,
@@ -74,12 +80,14 @@ export async function POST(req: Request) {
       }),
     });
 
+    clearTimeout(timeout);
     const json = await res.json();
     const text = json?.choices?.[0]?.message?.content ?? "";
     const clean = text.replace(/```json|```/g, "").trim();
     const result = JSON.parse(clean) as PortfolioOutput;
     return NextResponse.json({ ...result, lines: withAmounts(result.lines) }, { headers: CORS });
   } catch (err) {
+    clearTimeout(timeout);
     console.error("API error:", err);
     return NextResponse.json({ ...FALLBACK, lines: withAmounts(FALLBACK.lines) }, { headers: CORS });
   }
