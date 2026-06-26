@@ -92,7 +92,6 @@ export default function Home() {
             <div className="field">
               <div style={lbl}>01 — Amount to invest</div>
               <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                <span style={{ fontSize: 16, fontWeight: 600, color: "#4a506b" }}>{currency}</span>
                 <input className="amount-input" type="text" inputMode="numeric"
                   value={amount} onChange={e => setAmount(e.target.value)} placeholder="10,000" />
               </div>
