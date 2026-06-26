@@ -5,21 +5,21 @@ import { Sidebar } from "@/components/Sidebar";
 import type { InvestmentStyle, MarketScope, RiskLevel } from "@/lib/types";
 
 const STYLES: { id: InvestmentStyle; icon: string; name: string; desc: string }[] = [
-  { id: "tech",      icon: "🤖", name: "Tech & AI",      desc: "Nasdaq, semis, cloud" },
-  { id: "esg",       icon: "🌱", name: "ESG",            desc: "Sustainable, green" },
-  { id: "value",     icon: "💎", name: "Value",          desc: "Undervalued, quality" },
-  { id: "dividend",  icon: "💰", name: "Dividend",       desc: "Income, yield" },
-  { id: "balanced",  icon: "⚖️", name: "Balanced",       desc: "Classic 60/40" },
-  { id: "emerging",  icon: "🌏", name: "Emerging",       desc: "EM, India, SEA" },
-  { id: "realestate",icon: "🏠", name: "Real Estate",    desc: "REITs, property" },
-  { id: "commodities",icon:"🪙", name: "Commodities",    desc: "Gold, oil, metals" },
-  { id: "bonds",     icon: "📄", name: "Bonds",          desc: "Fixed income, safety" },
+  { id: "tech",        icon: "🤖", name: "Tech & AI",    desc: "Nasdaq, semis, cloud" },
+  { id: "esg",         icon: "🌱", name: "ESG",          desc: "Sustainable, green" },
+  { id: "value",       icon: "💎", name: "Value",        desc: "Undervalued, quality" },
+  { id: "dividend",    icon: "💰", name: "Dividend",     desc: "Income, yield" },
+  { id: "balanced",    icon: "⚖️", name: "Balanced",     desc: "Classic 60/40" },
+  { id: "emerging",    icon: "🌏", name: "Emerging",     desc: "EM, India, SEA" },
+  { id: "realestate",  icon: "🏠", name: "Real Estate",  desc: "REITs, property" },
+  { id: "commodities", icon: "🪙", name: "Commodities",  desc: "Gold, oil, metals" },
+  { id: "bonds",       icon: "📄", name: "Bonds",        desc: "Fixed income, safety" },
 ];
 
-const RISKS: { id: RiskLevel; name: string; desc: string; ret: string }[] = [
-  { id: "low",    name: "Conservative", desc: "Mostly bonds",     ret: "~3–5% / yr" },
-  { id: "medium", name: "Balanced",     desc: "Mix stocks/bonds", ret: "~6–8% / yr" },
-  { id: "high",   name: "Aggressive",   desc: "Mostly stocks",    ret: "~8–12% / yr" },
+const RISKS: { id: RiskLevel; name: string; desc: string; ret: string; vol: string }[] = [
+  { id: "low",    name: "Conservative", desc: "Mostly bonds",     ret: "~3–5% / yr",  vol: "Low volatility" },
+  { id: "medium", name: "Balanced",     desc: "Mix stocks/bonds", ret: "~6–8% / yr",  vol: "Medium volatility" },
+  { id: "high",   name: "Aggressive",   desc: "Mostly stocks",    ret: "~8–12% / yr", vol: "High volatility" },
 ];
 
 const CURRENCIES = [
@@ -88,7 +88,6 @@ export default function Home() {
               <p className="hero-sub">5 questions. Get your personalised portfolio with exact ETFs, ISINs, and amounts.</p>
             </div>
 
-            {/* 01 Amount */}
             <div className="field">
               <div style={lbl}>01 — Amount to invest</div>
               <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
@@ -97,7 +96,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 02 Horizon */}
             <div className="field">
               <div style={lbl}>02 — Investment horizon</div>
               <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
@@ -108,7 +106,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 03 Risk */}
             <div className="field">
               <div style={lbl}>03 — Risk level</div>
               <div style={{ display: "flex", gap: 8, flexDirection: "column" }}>
@@ -119,7 +116,10 @@ export default function Home() {
                         <div style={{ fontSize: 13, fontWeight: 600, color: "#2d3142" }}>{r.name}</div>
                         <div style={{ fontSize: 11, color: "#9099ab", marginTop: 2 }}>{r.desc}</div>
                       </div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "#16a34a" }}>{r.ret}</div>
+                      <div style={{ textAlign: "right" }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "#16a34a" }}>{r.ret}</div>
+                        <div style={{ fontSize: 10, color: "#9099ab", marginTop: 2 }}>{r.vol}</div>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -130,7 +130,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 04 Style — 9 options */}
             <div className="field">
               <div style={lbl}>04 — What do you believe in? <span style={{ fontWeight: 400, fontSize: 10, textTransform: "none", letterSpacing: 0 }}>select one or more</span></div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
@@ -145,7 +144,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 05 Currency */}
             <div className="field">
               <div style={lbl}>05 — Investment currency</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: 8 }}>
@@ -159,7 +157,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Submit */}
             <div style={{ paddingTop: 24 }}>
               <div onClick={submit} style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 8,

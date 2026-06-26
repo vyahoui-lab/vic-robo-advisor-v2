@@ -11,7 +11,7 @@ function fmtChf(n: number) {
 }
 
 const RISK_LABEL: Record<string, string> = { low: "Conservative", medium: "Balanced", high: "Aggressive" };
-const STYLE_ICON: Record<string, string> = { tech: "🤖", esg: "🌱", value: "💎", dividend: "💰", balanced: "⚖️", emerging: "🌏" };
+const STYLE_ICON: Record<string, string> = { tech: "🤖", esg: "🌱", value: "💎", dividend: "💰", balanced: "⚖️", emerging: "🌏", realestate: "🏠", commodities: "🪙", bonds: "📄" };
 
 function Results() {
   const router = useRouter();
@@ -88,7 +88,7 @@ function Results() {
               <div className="kpi-val" style={{ fontSize: 16, paddingTop: 4 }}>
                 {STYLE_ICON[data.intake.style]} {RISK_LABEL[data.intake.risk]}
               </div>
-              <div className="kpi-sub">{data.intake.scope} focus</div>
+              <div className="kpi-sub">{data.intake.currency ?? "CHF"}</div>
             </div>
             <div className="kpi">
               <div className="kpi-label">Avg TER cost/yr</div>
@@ -124,8 +124,21 @@ function Results() {
             ))}
           </div>
 
+          {/* Methodology */}
+          <div style={{
+            background: "#f8f8f6", border: "1px solid #e4e3de", borderRadius: 10,
+            padding: "16px 20px", marginTop: 16
+          }}>
+            <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", color: "#9099ab", fontWeight: 600, marginBottom: 8 }}>
+              🧠 How this portfolio was built
+            </div>
+            <p style={{ fontSize: 13, color: "#4a506b", lineHeight: 1.7 }}>
+              Your answers were analysed using <strong style={{ color: "#2d3142" }}>Modern Portfolio Theory (MPT)</strong> — the academic framework for balancing expected return against risk, developed by Harry Markowitz. Based on your risk level, the AI allocates across <strong style={{ color: "#2d3142" }}>equities, bonds, and alternatives</strong>, weighted by your investment convictions. It then selects real, low-cost ETFs with valid ISINs, minimising total expense ratio (TER) drag on your returns. The portfolio is generated in real time by a <strong style={{ color: "#2d3142" }}>large language model (LLM) API</strong>, trained on financial data and guided by finance theory.
+            </p>
+          </div>
+
           <div className="disclaimer">
-            Vic Investment Club · For illustration and educational purposes only · Not regulated financial advice · Always verify ISINs before investing
+            VIC Investment Club · For illustration and educational purposes only · Not regulated financial advice · Always verify ISINs before investing
           </div>
         </div>
       </main>
