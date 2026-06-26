@@ -7,7 +7,7 @@ import type { PortfolioOutput, IntakeData } from "@/lib/types";
 type Stored = PortfolioOutput & { intake: IntakeData };
 
 function fmtChf(n: number) {
-  return new Intl.NumberFormat("de-CH", { style: "currency", currency: "CHF", maximumFractionDigits: 0 }).format(n);
+  return new Intl.NumberFormat("de-CH", { maximumFractionDigits: 0 }).format(n);
 }
 
 const RISK_LABEL: Record<string, string> = { low: "Conservative", medium: "Balanced", high: "Aggressive" };
