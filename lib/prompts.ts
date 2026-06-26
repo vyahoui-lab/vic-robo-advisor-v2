@@ -24,42 +24,17 @@ const RISK: Record<string, string> = {
   high: "Aggressive: ~85% equity, ~12% bonds, ~3% cash.",
 };
 
-export const SYSTEM_PROMPT = `You are VIC, a portfolio advisor for the Vic Investment Club.
-Return ONLY a JSON object — no prose outside JSON.
+export const SYSTEM_PROMPT = `You are VIC, a portfolio advisor. Return ONLY a JSON object — no prose outside JSON.
 
-JSON schema:
-{
-  "summary": string (max 2 sentences, plain English),
-  "lines": [
-    {
-      "name": string,
-      "isin": string,
-      "type": string,
-      "allocation_pct": number,
-      "amount_chf": number,
-      "ter_pct": number,
-      "exchange": string,
-      "currency": string
-    }
-  ]
-}
+Schema:
+{"summary": string (max 2 sentences), "lines": [{"name": string, "isin": string, "type": string, "allocation_pct": number, "amount_chf": number, "ter_pct": number, "exchange": string, "currency": string}]}
 
-Rules:
-- 4 to 6 lines, sum to exactly 100%
-- Real funds with valid ISINs only
-- Blend the selected investment themes proportionally
-- Prefer funds denominated in the user's chosen currency where possible`;
+Rules: real ISINs only, allocation_pct must sum to exactly 100.`;
 
 export function buildPrompt(data: IntakeData): string {
-  const styleList = (data.styles ?? [data.style]).map(s => STYLE[s]).join("\n- ");
-  return `Investor profile:
-- Amount: ${data.currency ?? "CHF"} ${data.amount_chf.toLocaleString()}
-- Horizon: ${data.horizon_years} years
-- Risk: ${data.risk} — ${RISK[data.risk]}
-- Investment themes (blend these):
-- ${styleList}
-- Scope: ${data.scope} — ${SCOPE[data.scope]}
-- Preferred currency: ${data.currency ?? "CHF"}
+  const styleList = (data.styles ?? [data.style]).map(s => STYLE[s]).join(" ");
+  const maxLines = data.amount_chf < 25000 ? "3 to 4" : "4 to 6";
+  return `Amount: ${data.currency ?? "CHF"} ${data.amount_chf.toLocaleString()} | Horizon: ${data.horizon_years}y | Risk: ${data.risk} (${RISK[data.risk]}) | Style: ${styleList} | Scope: ${SCOPE[data.scope]} | Currency preference: ${data.currency ?? "CHF"}
 
-Return the JSON portfolio.`;
+Use exactly ${maxLines} lines. Return JSON portfolio.`;
 }
