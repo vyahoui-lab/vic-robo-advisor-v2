@@ -24,15 +24,13 @@ const RISKS: { id: RiskLevel; name: string; desc: string; ret: string; vol: stri
 
 const CURRENCIES = [
   { code: "CHF", flag: "🇨🇭", name: "Swiss Franc" },
-  { code: "USD", flag: "🇺🇸", name: "US Dollar" },
   { code: "EUR", flag: "🇪🇺", name: "Euro" },
+  { code: "USD", flag: "🇺🇸", name: "US Dollar" },
   { code: "GBP", flag: "🇬🇧", name: "British Pound" },
-  { code: "JPY", flag: "🇯🇵", name: "Japanese Yen" },
-  { code: "AUD", flag: "🇦🇺", name: "Australian Dollar" },
   { code: "CAD", flag: "🇨🇦", name: "Canadian Dollar" },
-  { code: "CNY", flag: "🇨🇳", name: "Chinese Yuan" },
-  { code: "HKD", flag: "🇭🇰", name: "Hong Kong Dollar" },
+  { code: "AUD", flag: "🇦🇺", name: "Australian Dollar" },
   { code: "SGD", flag: "🇸🇬", name: "Singapore Dollar" },
+  { code: "HKD", flag: "🇭🇰", name: "Hong Kong Dollar" },
 ];
 
 const card = (on: boolean): React.CSSProperties => ({
@@ -97,7 +95,7 @@ export default function Home() {
             </div>
 
             <div className="field">
-              <div style={lbl}>02 — Investment horizon</div>
+              <div style={lbl}>02 — How long do you plan to invest?</div>
               <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
                 <input className="amount-input" type="text" inputMode="numeric"
                   style={{ width: 80 }}
