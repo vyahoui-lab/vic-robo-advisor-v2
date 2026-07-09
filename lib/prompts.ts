@@ -1,21 +1,24 @@
 import type { IntakeData } from "./types";
 
 const STYLE: Record<string, string> = {
-  tech: "Tech & AI: Nasdaq-100, semiconductor ETFs, global tech funds.",
-  esg: "ESG/Sustainable: SRI-labeled funds, green bonds, impact funds.",
-  value: "Value: MSCI World Value, undervalued equities, quality factor.",
-  dividend: "Dividend: MSCI High Dividend Yield, dividend aristocrats.",
-  balanced: "Balanced: classic MSCI World + bond mix.",
-  emerging: "Emerging Markets: MSCI EM, India, Southeast Asia.",
-  realestate: "Real Estate: REIT ETFs, global property funds.",
+  tech:        "Tech & AI: Nasdaq-100, semiconductor ETFs, global tech funds.",
+  esg:         "ESG/Sustainable: SRI-labeled funds, green bonds, impact funds.",
+  value:       "Value: MSCI World Value, undervalued equities, quality factor.",
+  dividend:    "Dividend: MSCI High Dividend Yield, dividend aristocrats.",
+  balanced:    "Balanced: classic MSCI World + bond mix.",
+  emerging:    "Emerging Markets: MSCI EM, India, Southeast Asia.",
+  realestate:  "Real Estate: REIT ETFs, global property funds.",
   commodities: "Commodities: gold ETFs, broad commodity ETFs, energy.",
-  bonds: "Fixed Income: aggregate bond ETFs, government bonds, investment grade.",
+  bonds:       "Fixed Income: aggregate bond ETFs, government bonds, investment grade.",
+  healthcare:  "Healthcare: biotech and pharma ETFs, MSCI World Health Care.",
+  financials:  "Financials: banking and insurance ETFs, MSCI World Financials.",
+  agriculture: "Agriculture: agri commodity ETFs, food sector funds.",
 };
 
 const RISK: Record<string, string> = {
-  low: "Conservative: ~40% equity, ~50% bonds, ~10% cash.",
+  low:    "Conservative: ~40% equity, ~50% bonds, ~10% cash.",
   medium: "Balanced: ~65% equity, ~30% bonds, ~5% cash.",
-  high: "Aggressive: ~85% equity, ~12% bonds, ~3% cash.",
+  high:   "Aggressive: ~85% equity, ~12% bonds, ~3% cash.",
 };
 
 function horizonRule(years: number): string {
@@ -26,16 +29,16 @@ function horizonRule(years: number): string {
 
 function currencyRule(currency: string): string {
   const rules: Record<string, string> = {
-    CHF: "Prefer CHF-hedged funds or funds listed on SIX Swiss Exchange. Avoid unhedged USD exposure.",
-    USD: "Prefer USD-denominated funds listed on US exchanges or Xetra. S&P 500, Nasdaq ETFs are appropriate.",
-    EUR: "Prefer EUR-denominated funds listed on Xetra or Euronext Amsterdam. UCITS ETFs in EUR.",
+    CHF: "Prefer CHF-hedged funds or funds listed on SIX Swiss Exchange.",
+    USD: "Prefer USD-denominated funds on Xetra or US exchanges. S&P 500, Nasdaq ETFs are appropriate.",
+    EUR: "Prefer EUR-denominated UCITS ETFs listed on Xetra or Euronext Amsterdam.",
     GBP: "Prefer GBP-denominated funds listed on London Stock Exchange (LSE).",
-    JPY: "Prefer globally diversified UCITS ETFs. Note: few ETFs are JPY-denominated, EUR/USD alternatives are acceptable.",
-    AUD: "Prefer globally diversified UCITS ETFs. USD/EUR alternatives are acceptable.",
-    CAD: "Prefer globally diversified UCITS ETFs. USD alternatives are acceptable.",
+    JPY: "Prefer globally diversified UCITS ETFs. EUR/USD alternatives are acceptable.",
     CNY: "Prefer globally diversified UCITS ETFs. USD/EUR alternatives are acceptable.",
-    HKD: "Prefer globally diversified UCITS ETFs. USD alternatives are acceptable.",
+    CAD: "Prefer globally diversified UCITS ETFs. USD alternatives are acceptable.",
+    AUD: "Prefer globally diversified UCITS ETFs. USD alternatives are acceptable.",
     SGD: "Prefer globally diversified UCITS ETFs. USD/EUR alternatives are acceptable.",
+    HKD: "Prefer globally diversified UCITS ETFs. USD alternatives are acceptable.",
   };
   return rules[currency] ?? "Prefer globally diversified UCITS ETFs.";
 }

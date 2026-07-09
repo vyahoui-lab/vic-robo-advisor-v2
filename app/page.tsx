@@ -5,15 +5,18 @@ import { Sidebar } from "@/components/Sidebar";
 import type { InvestmentStyle, MarketScope, RiskLevel } from "@/lib/types";
 
 const STYLES: { id: InvestmentStyle; icon: string; name: string; desc: string }[] = [
-  { id: "tech",        icon: "🤖", name: "Tech & AI",    desc: "Nasdaq, semis, cloud" },
-  { id: "esg",         icon: "🌱", name: "ESG",          desc: "Sustainable, green" },
-  { id: "value",       icon: "💎", name: "Value",        desc: "Undervalued, quality" },
-  { id: "dividend",    icon: "💰", name: "Dividend",     desc: "Income, yield" },
-  { id: "balanced",    icon: "⚖️", name: "Balanced",     desc: "Classic 60/40" },
-  { id: "emerging",    icon: "🌏", name: "Emerging",     desc: "EM, India, SEA" },
-  { id: "realestate",  icon: "🏠", name: "Real Estate",  desc: "REITs, property" },
-  { id: "commodities", icon: "🪙", name: "Commodities",  desc: "Gold, oil, metals" },
-  { id: "bonds",       icon: "📄", name: "Bonds",        desc: "Fixed income, safety" },
+  { id: "tech",        icon: "🤖", name: "Tech & AI",          desc: "Nasdaq, semis, cloud" },
+  { id: "esg",         icon: "🌱", name: "ESG",                desc: "Sustainable, green" },
+  { id: "value",       icon: "💎", name: "Value",              desc: "Undervalued, quality" },
+  { id: "dividend",    icon: "💰", name: "Dividend",           desc: "Income, yield" },
+  { id: "balanced",    icon: "⚖️", name: "Balanced",           desc: "Classic 60/40" },
+  { id: "emerging",    icon: "🌏", name: "Emerging",           desc: "EM, India, SEA" },
+  { id: "realestate",  icon: "🏠", name: "Real Estate",        desc: "REITs, property" },
+  { id: "commodities", icon: "🪙", name: "Commodities",        desc: "Gold, oil, metals" },
+  { id: "bonds",       icon: "📄", name: "Bonds",              desc: "Fixed income, safety" },
+  { id: "healthcare",  icon: "🧬", name: "Healthcare",         desc: "Biotech, pharma" },
+  { id: "financials",  icon: "🏦", name: "Financials",         desc: "Banks, insurance" },
+  { id: "agriculture", icon: "🌾", name: "Agriculture",        desc: "Food, agri, commodities" },
 ];
 
 const RISKS: { id: RiskLevel; name: string; desc: string; ret: string; vol: string }[] = [
@@ -31,6 +34,8 @@ const CURRENCIES = [
   { code: "AUD", flag: "🇦🇺", name: "Australian Dollar" },
   { code: "SGD", flag: "🇸🇬", name: "Singapore Dollar" },
   { code: "HKD", flag: "🇭🇰", name: "Hong Kong Dollar" },
+  { code: "JPY", flag: "🇯🇵", name: "Japanese Yen" },
+  { code: "CNY", flag: "🇨🇳", name: "Chinese Yuan" },
 ];
 
 const card = (on: boolean): React.CSSProperties => ({
@@ -71,7 +76,12 @@ export default function Home() {
     router.push(`/results?d=${encoded}`);
   }
 
-  const lbl: React.CSSProperties = { fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em", color: "#9099ab", fontWeight: 600, marginBottom: 12 };
+  const lbl = (title: string, question: string) => (
+    <div style={{ marginBottom: 14 }}>
+      <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em", color: "#9099ab", fontWeight: 600 }}>{title}</div>
+      <div style={{ fontSize: 13, color: "#2d3142", fontWeight: 500, marginTop: 3 }}>{question}</div>
+    </div>
+  );
 
   return (
     <div className="shell">
@@ -86,16 +96,18 @@ export default function Home() {
               <p className="hero-sub">5 questions. Get your personalised portfolio with exact ETFs, ISINs, and amounts.</p>
             </div>
 
+            {/* 01 Amount */}
             <div className="field">
-              <div style={lbl}>01 — Amount to invest</div>
+              {lbl("01 — Amount to invest", "How much do you want to invest?")}
               <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
                 <input className="amount-input" type="text" inputMode="numeric"
                   value={amount} onChange={e => setAmount(e.target.value)} placeholder="10,000" />
               </div>
             </div>
 
+            {/* 02 Horizon */}
             <div className="field">
-              <div style={lbl}>02 — How long do you plan to invest?</div>
+              {lbl("02 — Investment horizon", "How long do you plan to invest?")}
               <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
                 <input className="amount-input" type="text" inputMode="numeric"
                   style={{ width: 80 }}
@@ -104,8 +116,9 @@ export default function Home() {
               </div>
             </div>
 
+            {/* 03 Risk */}
             <div className="field">
-              <div style={lbl}>03 — Risk level</div>
+              {lbl("03 — Risk level", "How much risk are you comfortable with?")}
               <div style={{ display: "flex", gap: 8, flexDirection: "column" }}>
                 {RISKS.map(r => (
                   <div key={r.id} style={card(risk === r.id)} onClick={() => setRisk(r.id)}>
@@ -128,8 +141,9 @@ export default function Home() {
               </div>
             </div>
 
+            {/* 04 Style */}
             <div className="field">
-              <div style={lbl}>04 — What do you believe in? <span style={{ fontWeight: 400, fontSize: 10, textTransform: "none", letterSpacing: 0 }}>select one or more</span></div>
+              {lbl("04 — Investment themes", "What do you believe in? Select one or more.")}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
                 {STYLES.map(s => (
                   <div key={s.id} style={card(styles.includes(s.id))} onClick={() => toggleStyle(s.id)}>
@@ -142,8 +156,9 @@ export default function Home() {
               </div>
             </div>
 
+            {/* 05 Currency */}
             <div className="field">
-              <div style={lbl}>05 — Investment currency</div>
+              {lbl("05 — Investment currency", "In what currency do you invest?")}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: 8 }}>
                 {CURRENCIES.map(c => (
                   <div key={c.code} style={card(currency === c.code)} onClick={() => setCurrency(c.code)}>
@@ -155,6 +170,7 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Submit */}
             <div style={{ paddingTop: 24 }}>
               <div onClick={submit} style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 8,

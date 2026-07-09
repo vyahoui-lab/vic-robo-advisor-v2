@@ -1,4 +1,4 @@
-export type InvestmentStyle = "tech" | "esg" | "value" | "dividend" | "balanced" | "emerging" | "realestate" | "commodities" | "bonds";
+export type InvestmentStyle = "tech" | "esg" | "value" | "dividend" | "balanced" | "emerging" | "realestate" | "commodities" | "bonds" | "healthcare" | "financials" | "agriculture";
 export type MarketScope = "swiss" | "international" | "mixed";
 export type RiskLevel = "low" | "medium" | "high";
 
