@@ -10,9 +10,6 @@ const STYLE: Record<string, string> = {
   realestate:  "Real Estate: REIT ETFs, global property funds.",
   commodities: "Commodities: gold ETFs, broad commodity ETFs, energy.",
   bonds:       "Fixed Income: aggregate bond ETFs, government bonds, investment grade.",
-  healthcare:  "Healthcare: biotech and pharma ETFs, MSCI World Health Care.",
-  financials:  "Financials: banking and insurance ETFs, MSCI World Financials.",
-  agriculture: "Agriculture: agri commodity ETFs, food sector funds.",
 };
 
 const RISK: Record<string, string> = {
@@ -33,12 +30,8 @@ function currencyRule(currency: string): string {
     USD: "Prefer USD-denominated funds on Xetra or US exchanges. S&P 500, Nasdaq ETFs are appropriate.",
     EUR: "Prefer EUR-denominated UCITS ETFs listed on Xetra or Euronext Amsterdam.",
     GBP: "Prefer GBP-denominated funds listed on London Stock Exchange (LSE).",
-    JPY: "Prefer globally diversified UCITS ETFs. EUR/USD alternatives are acceptable.",
-    CNY: "Prefer globally diversified UCITS ETFs. USD/EUR alternatives are acceptable.",
-    CAD: "Prefer globally diversified UCITS ETFs. USD alternatives are acceptable.",
     AUD: "Prefer globally diversified UCITS ETFs. USD alternatives are acceptable.",
     SGD: "Prefer globally diversified UCITS ETFs. USD/EUR alternatives are acceptable.",
-    HKD: "Prefer globally diversified UCITS ETFs. USD alternatives are acceptable.",
   };
   return rules[currency] ?? "Prefer globally diversified UCITS ETFs.";
 }

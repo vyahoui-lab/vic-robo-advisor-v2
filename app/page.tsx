@@ -5,18 +5,15 @@ import { Sidebar } from "@/components/Sidebar";
 import type { InvestmentStyle, MarketScope, RiskLevel } from "@/lib/types";
 
 const STYLES: { id: InvestmentStyle; icon: string; name: string; desc: string }[] = [
-  { id: "tech",        icon: "🤖", name: "Tech & AI",          desc: "Nasdaq, semis, cloud" },
-  { id: "esg",         icon: "🌱", name: "ESG",                desc: "Sustainable, green" },
-  { id: "value",       icon: "💎", name: "Value",              desc: "Undervalued, quality" },
-  { id: "dividend",    icon: "💰", name: "Dividend",           desc: "Income, yield" },
-  { id: "balanced",    icon: "⚖️", name: "Balanced",           desc: "Classic 60/40" },
-  { id: "emerging",    icon: "🌏", name: "Emerging",           desc: "EM, India, SEA" },
-  { id: "realestate",  icon: "🏠", name: "Real Estate",        desc: "REITs, property" },
-  { id: "commodities", icon: "🪙", name: "Commodities",        desc: "Gold, oil, metals" },
-  { id: "bonds",       icon: "📄", name: "Bonds",              desc: "Fixed income, safety" },
-  { id: "healthcare",  icon: "🧬", name: "Healthcare",         desc: "Biotech, pharma" },
-  { id: "financials",  icon: "🏦", name: "Financials",         desc: "Banks, insurance" },
-  { id: "agriculture", icon: "🌾", name: "Agriculture",        desc: "Food, agri, commodities" },
+  { id: "tech",        icon: "🤖", name: "Tech & AI",    desc: "Nasdaq, semis, cloud" },
+  { id: "esg",         icon: "🌱", name: "ESG",          desc: "Sustainable, green" },
+  { id: "value",       icon: "💎", name: "Value",        desc: "Undervalued, quality" },
+  { id: "dividend",    icon: "💰", name: "Dividend",     desc: "Income, yield" },
+  { id: "balanced",    icon: "⚖️", name: "Balanced",     desc: "Classic 60/40" },
+  { id: "emerging",    icon: "🌏", name: "Emerging",     desc: "EM, India, SEA" },
+  { id: "realestate",  icon: "🏠", name: "Real Estate",  desc: "REITs, property" },
+  { id: "commodities", icon: "🪙", name: "Commodities",  desc: "Gold, oil, metals" },
+  { id: "bonds",       icon: "📄", name: "Bonds",        desc: "Fixed income, safety" },
 ];
 
 const RISKS: { id: RiskLevel; name: string; desc: string; ret: string; vol: string }[] = [
@@ -30,12 +27,8 @@ const CURRENCIES = [
   { code: "EUR", flag: "🇪🇺", name: "Euro" },
   { code: "USD", flag: "🇺🇸", name: "US Dollar" },
   { code: "GBP", flag: "🇬🇧", name: "British Pound" },
-  { code: "CAD", flag: "🇨🇦", name: "Canadian Dollar" },
   { code: "AUD", flag: "🇦🇺", name: "Australian Dollar" },
   { code: "SGD", flag: "🇸🇬", name: "Singapore Dollar" },
-  { code: "HKD", flag: "🇭🇰", name: "Hong Kong Dollar" },
-  { code: "JPY", flag: "🇯🇵", name: "Japanese Yen" },
-  { code: "CNY", flag: "🇨🇳", name: "Chinese Yuan" },
 ];
 
 const card = (on: boolean): React.CSSProperties => ({
@@ -159,7 +152,7 @@ export default function Home() {
             {/* 05 Currency */}
             <div className="field">
               {lbl("05 — Investment currency", "In what currency do you invest?")}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: 8 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
                 {CURRENCIES.map(c => (
                   <div key={c.code} style={card(currency === c.code)} onClick={() => setCurrency(c.code)}>
                     <div style={{ fontSize: 18, marginBottom: 4 }}>{c.flag}</div>

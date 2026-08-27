@@ -7,12 +7,14 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
+const StyleEnum = z.enum(["tech", "esg", "value", "dividend", "balanced", "emerging", "realestate", "commodities", "bonds"]);
+
 const Schema = z.object({
   amount_chf: z.number().min(100).max(10000000),
   horizon_years: z.number().int().min(1).max(50),
   risk: z.enum(["low", "medium", "high"]),
-  style: z.enum(["tech", "esg", "value", "dividend", "balanced", "emerging", "realestate", "commodities", "bonds"]),
-  styles: z.array(z.enum(["tech", "esg", "value", "dividend", "balanced", "emerging", "realestate", "commodities", "bonds"])).optional(),
+  style: StyleEnum,
+  styles: z.array(StyleEnum).optional(),
   scope: z.enum(["swiss", "international", "mixed"]),
   currency: z.string().optional(),
 });
