@@ -14,6 +14,7 @@ const STYLES: { id: InvestmentStyle; icon: string; name: string; desc: string }[
   { id: "realestate",  icon: "🏠", name: "Real Estate",  desc: "REITs, property" },
   { id: "commodities", icon: "🪙", name: "Commodities",  desc: "Gold, oil, metals" },
   { id: "bonds",       icon: "📄", name: "Bonds",        desc: "Fixed income, safety" },
+  { id: "crypto",      icon: "₿",  name: "Crypto",       desc: "Bitcoin, Ethereum, blockchain" },
 ];
 
 const RISKS: { id: RiskLevel; name: string; desc: string; ret: string; vol: string }[] = [

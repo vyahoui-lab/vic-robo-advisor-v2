@@ -10,6 +10,7 @@ const STYLE: Record<string, string> = {
   realestate:  "Real Estate: REIT ETFs, global property funds.",
   commodities: "Commodities: gold ETFs, broad commodity ETFs, energy.",
   bonds:       "Fixed Income: aggregate bond ETFs, government bonds, investment grade.",
+  crypto:      "Crypto & Blockchain: Bitcoin ETFs, Ethereum ETFs, blockchain infrastructure funds.",
 };
 
 const RISK: Record<string, string> = {
@@ -60,7 +61,8 @@ Rules:
 - Use ONLY real funds with valid ISINs
 - allocation_pct must sum to exactly 100
 - Blend the selected investment themes proportionally
-- Strictly follow the horizon and currency rules provided`;
+- Strictly follow the horizon and currency rules provided
+- For crypto themes, use only regulated UCITS-compliant Bitcoin or Ethereum ETFs/ETPs with valid ISINs (e.g. 21Shares, WisdomTree, VanEck crypto ETPs)`;
 
 export function buildPrompt(data: IntakeData): string {
   const styleList = (data.styles ?? [data.style]).map(s => STYLE[s]).join("\n- ");

@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
-const StyleEnum = z.enum(["tech", "esg", "value", "dividend", "balanced", "emerging", "realestate", "commodities", "bonds"]);
+const StyleEnum = z.enum(["tech", "esg", "value", "dividend", "balanced", "emerging", "realestate", "commodities", "bonds", "crypto"]);
 
 const Schema = z.object({
   amount_chf: z.number().min(100).max(10000000),
