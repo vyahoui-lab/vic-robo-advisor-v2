@@ -52,9 +52,7 @@ export async function POST(req: Request) {
   const withAmounts = (lines: PortfolioOutput["lines"]) =>
     lines.map(l => ({ ...l, amount_chf: Math.round(l.allocation_pct / 100 * data.amount_chf) }));
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  const baseUrl = process.env.OPENAI_BASE_URL ?? "https://api.groq.com/openai/v1";
-  const model = process.env.OPENAI_MODEL ?? "llama-3.3-70b-versatile";
+  const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
     return NextResponse.json({ ...FALLBACK, lines: withAmounts(FALLBACK.lines) }, { headers: CORS });
@@ -64,40 +62,40 @@ export async function POST(req: Request) {
   const timeout = setTimeout(() => controller.abort(), 25000);
 
   try {
-    const res = await fetch(`${baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
-      },
-      signal: controller.signal,
-      body: JSON.stringify({
-        model,
-        temperature: 0.3,
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT + "\n\nIMPORTANT: Your entire response must be valid JSON only. No text before or after the JSON object." },
-          { role: "user", content: buildPrompt(data) },
-        ],
-      }),
-    });
+    const prompt = SYSTEM_PROMPT + "\n\n" + buildPrompt(data);
+
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.3,
+            responseMimeType: "application/json",
+          },
+        }),
+      }
+    );
 
     clearTimeout(timeout);
 
     if (!res.ok) {
       const errText = await res.text();
-      console.error("Groq HTTP error:", res.status, errText);
+      console.error("Gemini HTTP error:", res.status, errText);
       return NextResponse.json({ ...FALLBACK, lines: withAmounts(FALLBACK.lines) }, { headers: CORS });
     }
 
     const json = await res.json();
-    const text = json?.choices?.[0]?.message?.content ?? "";
-    
+    const text = json?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+
     if (!text) {
-      console.error("Empty response from Groq");
+      console.error("Empty response from Gemini");
       return NextResponse.json({ ...FALLBACK, lines: withAmounts(FALLBACK.lines) }, { headers: CORS });
     }
 
-    // Extract JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       console.error("No JSON found in response:", text);
