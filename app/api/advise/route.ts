@@ -74,20 +74,39 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         model,
         temperature: 0.3,
-        response_format: { type: "json_object" },
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
+          { role: "system", content: SYSTEM_PROMPT + "\n\nIMPORTANT: Your entire response must be valid JSON only. No text before or after the JSON object." },
           { role: "user", content: buildPrompt(data) },
         ],
       }),
     });
 
     clearTimeout(timeout);
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error("Groq HTTP error:", res.status, errText);
+      return NextResponse.json({ ...FALLBACK, lines: withAmounts(FALLBACK.lines) }, { headers: CORS });
+    }
+
     const json = await res.json();
     const text = json?.choices?.[0]?.message?.content ?? "";
-    const clean = text.replace(/```json|```/g, "").trim();
-    const result = JSON.parse(clean) as PortfolioOutput;
+    
+    if (!text) {
+      console.error("Empty response from Groq");
+      return NextResponse.json({ ...FALLBACK, lines: withAmounts(FALLBACK.lines) }, { headers: CORS });
+    }
+
+    // Extract JSON from response
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error("No JSON found in response:", text);
+      return NextResponse.json({ ...FALLBACK, lines: withAmounts(FALLBACK.lines) }, { headers: CORS });
+    }
+
+    const result = JSON.parse(jsonMatch[0]) as PortfolioOutput;
     return NextResponse.json({ ...result, lines: withAmounts(result.lines) }, { headers: CORS });
+
   } catch (err) {
     clearTimeout(timeout);
     console.error("API error:", err);
