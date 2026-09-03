@@ -5,7 +5,7 @@ import { SYSTEM_PROMPT, buildPrompt } from "@/lib/prompts";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 const StyleEnum = z.enum(["tech", "esg", "value", "dividend", "balanced", "emerging", "realestate", "commodities", "bonds", "crypto"]);
 
@@ -59,13 +59,13 @@ export async function POST(req: Request) {
   }
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 25000);
+  const timeout = setTimeout(() => controller.abort(), 55000);
 
   try {
     const prompt = SYSTEM_PROMPT + "\n\n" + buildPrompt(data);
 
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
