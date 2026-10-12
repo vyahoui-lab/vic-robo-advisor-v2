@@ -11,6 +11,7 @@ const STYLE: Record<string, string> = {
   commodities: "Commodities: gold ETFs, broad commodity ETFs, energy.",
   bonds:       "Fixed Income: aggregate bond ETFs, government bonds, investment grade.",
   crypto:      "Crypto & Blockchain: Bitcoin ETFs, Ethereum ETFs, blockchain infrastructure funds.",
+  europe:      "Europe: broad European equity UCITS ETFs (MSCI Europe, STOXX Europe 600, Euro Stoxx 50).",
 };
 
 const RISK: Record<string, string> = {

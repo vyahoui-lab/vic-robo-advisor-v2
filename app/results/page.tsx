@@ -14,7 +14,7 @@ const RISK_LABEL: Record<string, string> = { low: "Conservative", medium: "Balan
 const STYLE_ICON: Record<string, string> = {
   tech: "🤖", esg: "🌱", value: "💎", dividend: "💰", balanced: "⚖️",
   emerging: "🌏", realestate: "🏠", commodities: "🪙", bonds: "📄",
-  healthcare: "🧬", financials: "🏦", agriculture: "🌾",
+  healthcare: "🧬", financials: "🏦", agriculture: "🌾", crypto: "₿", europe: "🇪🇺",
 };
 
 const RISK_RETURN: Record<string, { ret: string; vol: number; retVal: number }> = {
